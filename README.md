@@ -14,6 +14,58 @@ End-to-end, Docker-first data platform for health insurance analytics using Fran
 
 ## Visual Walkthrough
 
+flowchart TD
+    %% -------- Sources --------
+    A1[France / EU Open Data Sources]
+    A2[Local Sample Fixtures<br/>data/raw/sample]
+
+    %% -------- Ingestion --------
+    B[Ingestion Module<br/>src.ingestion.run]
+    C[Raw Layer<br/>data/raw + manifest.json + source_health_report.md]
+
+    %% -------- Processing --------
+    D[Stage Clean<br/>Spark]
+    E[Synthetic Event Expansion<br/>deterministic pseudonymized events]
+    F[Curated Star Schema<br/>Spark curated tables]
+
+    %% -------- Quality / Serving --------
+    G[Python Quality Checks]
+    H[PostgreSQL Load]
+    I[SQL / FK Quality Checks]
+    J[Notebook Analytics<br/>KPI + anomaly outputs]
+    K[Evidence Artifacts<br/>golden-run outputs + screenshots]
+
+    %% -------- Orchestration --------
+    O[Airflow DAG<br/>health_insurance_pipeline_v1]
+    P[Docker Compose Runtime]
+
+    %% -------- Flow --------
+    A1 -->|CSV / API| B
+    A2 -->|Fallback mode| B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    H --> I
+    H --> J
+    G --> K
+    I --> K
+    J --> K
+
+    %% -------- Orchestration links --------
+    P --> O
+    P --> H
+    O -. orchestrates .-> B
+    O -. orchestrates .-> D
+    O -. orchestrates .-> E
+    O -. orchestrates .-> F
+    O -. orchestrates .-> G
+    O -. orchestrates .-> H
+    O -. orchestrates .-> I
+    O -. orchestrates .-> J
+
 ### 1) Architecture
 
 ![Architecture](docs/architecture.png)
