@@ -13,7 +13,7 @@ End-to-end, Docker-first data platform for health insurance analytics using Fran
 | Measurable outputs | Curated table counts, KPI trend snapshots, anomaly-prep feature snapshots |
 
 ## Visual Walkthrough
-
+'''mermaid
 flowchart TD
     %% -------- Sources --------
     A1[France / EU Open Data Sources]
@@ -65,7 +65,7 @@ flowchart TD
     O -. orchestrates .-> H
     O -. orchestrates .-> I
     O -. orchestrates .-> J
-
+'''
 ### 1) Architecture
 
 ![Architecture](docs/architecture.png)
