@@ -1,141 +1,139 @@
-﻿# Health Insurance Big Data Platform
+# Health Insurance Big Data Platform
 
-Docker-first MVP data platform for France/EU open-health style analytics using Python, Spark, Airflow, PostgreSQL, and Jupyter.
+End-to-end, Docker-first data platform for health insurance analytics using France/EU open data, deterministic pseudonymized synthesis, Spark transformations, Airflow orchestration, and PostgreSQL serving.
 
-## Quick Recruiter Scan
+## Why This Project Is Recruiter-Ready
 
-- Architecture: [docs/architecture.png](docs/architecture.png)
-- DAG success proof: [artifacts/golden-run/2025-02-01/task_run_summary.md](artifacts/golden-run/2025-02-01/task_run_summary.md)
-- Curated row counts: [artifacts/golden-run/2025-02-01/curated_table_row_counts.csv](artifacts/golden-run/2025-02-01/curated_table_row_counts.csv)
-- Quality checks snapshot: [artifacts/golden-run/2025-02-01/quality_check_results.csv](artifacts/golden-run/2025-02-01/quality_check_results.csv)
-- KPI SQL output: [artifacts/golden-run/2025-02-01/sql_kpi_claims_trend.csv](artifacts/golden-run/2025-02-01/sql_kpi_claims_trend.csv)
-- Evidence mapping: [docs/showcase-evidence.md](docs/showcase-evidence.md)
+| Signal | Evidence |
+|---|---|
+| Full orchestrated pipeline | [Airflow DAG success (8/8 tasks)](artifacts/golden-run/2025-02-01/task_run_summary.md) |
+| Data engineering depth | Ingestion, staging, synthesis, star-schema modeling, quality framework, SQL analytics |
+| Reproducibility | Sample-first fallback with explicit source health reporting |
+| Production mindset | Dockerized services, idempotent run partitions, persisted quality checks |
+| Measurable outputs | Curated table counts, KPI trend snapshots, anomaly-prep feature snapshots |
 
-## Reproducible-First Data Strategy
+## Visual Walkthrough
 
-Default demo runs are intentionally stable and repeatable:
+### 1) Architecture
 
-- `src/config/pipeline.yaml` keeps `ingestion.use_sample_on_failure: true`.
-- If a public endpoint is unavailable, the pipeline falls back to local fixtures in `data/raw/sample`.
-- Ingestion writes both `manifest.json` and `source_health_report.md` so fallback vs live source usage is explicit.
+![Architecture](docs/architecture.png)
 
-Optional live connector experiments are isolated in:
+### 2) Orchestration + Runtime Evidence
 
-- `src/config/pipeline.live.yaml` (fallback disabled).
+![Airflow DAG Graph](artifacts/screenshots/01_airflow_dag_graph.png)
+![Airflow Task Success](artifacts/screenshots/02_airflow_task_success.png)
 
-## Golden Run (Docker, Recommended)
+### 3) Data + Quality Evidence
 
-### 1) Start services
+![Curated Tables in PostgreSQL](artifacts/screenshots/03_postgres_curated_tables.png)
+![Quality Check Results](artifacts/screenshots/04_quality_check_results.png)
+
+### 4) Analytics Output
+
+![KPI Notebook Output](artifacts/screenshots/05_notebook_kpi_output.png)
+
+## How The Code Works
+
+### Pipeline Data Flow
+
+```mermaid
+flowchart LR
+    A[France/EU Open Data + Local Sample Fixtures] --> B[Ingestion: src/ingestion]
+    B --> C[Raw Layer: data/raw/<run_date>]
+    C --> D[Stage Clean Spark Job]
+    D --> E[Deterministic Event Synthesis]
+    E --> F[Curated Star Schema]
+    F --> G[Python Quality Checks]
+    F --> H[PostgreSQL Load]
+    H --> I[SQL Quality Checks]
+    H --> J[KPI + Anomaly Analytics]
+```
+
+### Airflow Task to Module Mapping
+
+| Airflow task | Main module | What it does | Output |
+|---|---|---|---|
+| `ingest_raw` | `src.ingestion.run` | Pull source CSVs; fallback to fixtures when live endpoints fail | `data/raw/<run_date>/*.csv`, `manifest.json`, `source_health_report.md` |
+| `stage_clean` | `src.transformations.stage_clean` | Normalize schema/types/enums and clean source data | `data/staging/<run_date>/stg_*` |
+| `synthesize_events` | `src.transformations.synthesize_events` | Generate deterministic pseudonymous patient-level events | staged event parquet tables |
+| `build_dimensions` | `src.transformations.build_dimensions` | Build `dim_*` tables and surrogate keys | curated dimensions parquet |
+| `build_facts` | `src.transformations.build_facts` | Build `fact_*` tables with joins and business metrics | curated facts parquet |
+| `quality_checks` | `src.quality.run` | Run Python-native data quality validations | curated quality JSON + DB inserts |
+| `load_postgres` | `src.transformations.load_postgres` | Load curated model to PostgreSQL and run SQL checks | `curated.*`, `quality.check_results` |
+| `publish_notebooks_metadata` | `src.utils.publish_metadata` | Publish run metadata for analysis layer | `data/curated/<run_date>/metadata.json` |
+
+### Curated Star Schema (Golden Run Snapshot)
+
+| Table | Rows |
+|---|---:|
+| `curated.dim_date` | 47 |
+| `curated.dim_patient` | 259 |
+| `curated.dim_provider` | 5 |
+| `curated.dim_region` | 5 |
+| `curated.dim_treatment` | 6 |
+| `curated.fact_claims` | 126 |
+| `curated.fact_prescriptions` | 133 |
+| `curated.fact_reimbursements` | 119 |
+| `curated.fact_visits` | 85 |
+
+## Golden Run Results (`2025-02-01`)
+
+| Metric | Value |
+|---|---|
+| DAG state | `success` |
+| Task success rate | `8/8` |
+| Quality failures | `0` |
+| Reimbursement rate range | `0.7708` to `0.8373` |
+
+### KPI Trend Snapshot
+
+| Year | Month | Claims Volume | Billed Total | Reimbursed Total | Reimbursement Rate |
+|---:|---:|---:|---:|---:|---:|
+| 2025 | 1 | 98 | 23350.0 | 19550.0 | 0.8373 |
+| 2025 | 2 | 28 | 12000.0 | 9250.0 | 0.7708 |
+
+## Reproducible-First Design
+
+- Default config keeps `ingestion.use_sample_on_failure: true`.
+- Every source is logged in manifest and source-health report for auditability.
+- Optional live-source mode is isolated in `src/config/pipeline.live.yaml`.
+
+## Run It Locally (Docker, 3 Commands)
 
 ```bash
 cp .env.example .env
-docker compose down --remove-orphans
 docker compose build airflow-init
 docker compose up -d
 ```
 
-### 2) Validate Airflow health
-
-```bash
-# PowerShell
-(Invoke-WebRequest -Uri http://localhost:8080/health -UseBasicParsing).StatusCode
-```
-
-Expected: `200`.
-
-### 3) Run the full DAG for baseline date
+Run the full DAG for the baseline date:
 
 ```bash
 docker compose exec -T airflow-webserver airflow dags test health_insurance_pipeline_v1 2025-02-01
 ```
 
-Expected task chain success:
+## Tech Stack
 
-- `ingest_raw`
-- `stage_clean`
-- `synthesize_events`
-- `build_dimensions`
-- `build_facts`
-- `quality_checks`
-- `load_postgres`
-- `publish_notebooks_metadata`
+| Layer | Tools |
+|---|---|
+| Orchestration | Airflow 2.9.x |
+| Processing | PySpark 3.5.x |
+| Storage/Serving | PostgreSQL 15 |
+| Analytics | Jupyter + SQL notebooks |
+| Runtime | Docker Compose |
+| Quality | Native Python checks + SQL integrity checks |
 
-### 4) Verify evidence artifacts
+## Evidence Pack
 
-Artifacts are written under:
+- [Golden run report](artifacts/golden-run/2025-02-01/run_report.md)
+- [Task-level proof](artifacts/golden-run/2025-02-01/task_run_summary.md)
+- [Quality results snapshot](artifacts/golden-run/2025-02-01/quality_check_results.csv)
+- [KPI SQL output snapshot](artifacts/golden-run/2025-02-01/sql_kpi_claims_trend.csv)
+- [Anomaly feature snapshot](artifacts/golden-run/2025-02-01/sql_anomaly_provider_features.csv)
+- [Claim-to-evidence mapping](docs/showcase-evidence.md)
 
-- `artifacts/golden-run/2025-02-01/`
-- `artifacts/screenshots/`
-
-Required screenshot filenames:
-
-- `01_airflow_dag_graph.png`
-- `02_airflow_task_success.png`
-- `03_postgres_curated_tables.png`
-- `04_quality_check_results.png`
-- `05_notebook_kpi_output.png`
-
-## Local Development (.venv)
-
-Use local `.venv` for CLI development/testing. Airflow runtime remains Docker-only.
-
-```bash
-python -m venv .venv
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
-
-Core CLI contracts:
-
-```bash
-python -m src.ingestion.run --config src/config/pipeline.yaml --run-date 2025-02-01
-python -m src.transformations.run --layer staging --config src/config/pipeline.yaml --run-date 2025-02-01
-python -m src.transformations.run --layer curated --config src/config/pipeline.yaml --run-date 2025-02-01
-python -m src.quality.run --config src/config/pipeline.yaml --run-date 2025-02-01
-python -m src.transformations.load_postgres --config src/config/pipeline.yaml --run-date 2025-02-01
-```
-
-Optional metadata publication:
-
-```bash
-python -m src.utils.publish_metadata --config src/config/pipeline.yaml --run-date 2025-02-01
-```
-
-## Optional Live Source Mode
-
-For non-demo experiments only:
-
-```bash
-python -m src.ingestion.run --config src/config/pipeline.live.yaml --run-date 2025-02-01
-```
-
-This may fail if public links are unavailable, by design.
-
-## Docker Recovery Commands
-
-If stale containers/networks cause startup conflicts:
-
-```bash
-docker compose down --remove-orphans
-docker rm -f airflow_init airflow_webserver airflow_scheduler health_postgres health_spark health_jupyter 2>/dev/null || true
-```
-
-## Data Quality Guarantees
-
-Python checks and SQL checks are persisted to `quality.check_results`.
-
-Rules include:
-
-- schema presence and mandatory fields
-- ID uniqueness
-- enum validity (`claim_status`)
-- non-negative and bounded amounts (`reimbursed_amount <= billed_amount`)
-- FK integrity checks after load
-- staging-to-curated reconciliation
-
-## Notes
+## Compliance Notes
 
 - No PHI is used.
-- Patient-level rows are deterministic pseudonymized synthetic derivations from open aggregates.
-- Pipeline is idempotent per `run_date` partition.
+- Patient records are deterministic pseudonymized synthetic derivations from open aggregates.
+- Pipeline is idempotent by `run_date` partition.
