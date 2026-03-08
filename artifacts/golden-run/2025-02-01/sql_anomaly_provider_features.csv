@@ -1,0 +1,6 @@
+provider_sk,claim_events,unique_patients,rejected_claims,rejection_rate,avg_billed_amount,avg_reimbursed_amount
+2,35,35,0,0.0,150.0,128.57
+1,32,32,0,0.0,415.63,339.06
+4,25,25,0,0.0,84.0,70.0
+3,18,18,0,0.0,377.78,316.67
+5,16,16,0,0.0,493.75,375.0

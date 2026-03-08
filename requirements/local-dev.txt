@@ -1,0 +1,13 @@
+PyYAML>=6.0.2,<7
+requests>=2.32.3,<3
+pandas==2.2.2; python_version < "3.13"
+pandas>=2.3.0,<3; python_version >= "3.13"
+pyarrow==16.1.0; python_version < "3.13"
+fastparquet>=2024.5.0; python_version >= "3.13"
+sqlalchemy==2.0.32
+psycopg2-binary>=2.9.9,<3
+pyspark==3.5.2; python_version < "3.13"
+pyspark>=4.0.0; python_version >= "3.13"
+pytest==8.3.2
+notebook==7.2.1
+

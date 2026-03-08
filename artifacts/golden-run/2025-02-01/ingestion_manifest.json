@@ -1,0 +1,55 @@
+{
+  "generated_at_utc": "2026-03-08T10:12:14.897520+00:00",
+  "source_health_summary": {
+    "total_sources": 4,
+    "downloaded_count": 0,
+    "fallback_count": 4,
+    "fallback_ratio": 1.0
+  },
+  "results": [
+    {
+      "source_name": "providers",
+      "source_url": "https://www.data.gouv.fr/fr/datasets/r/finess-providers.csv",
+      "status": "fallback_sample",
+      "used_fallback": true,
+      "fallback_file": "providers_sample.csv",
+      "output_path": "/opt/project/data/raw/2025-02-01/providers.csv",
+      "records": 5,
+      "note": "Download failed. Used sample file providers_sample.csv.",
+      "error": "404 Client Error: NOT FOUND for url: https://www.data.gouv.fr/fr/datasets/r/finess-providers.csv"
+    },
+    {
+      "source_name": "claims",
+      "source_url": "https://www.data.gouv.fr/fr/datasets/r/open-damir-claims.csv",
+      "status": "fallback_sample",
+      "used_fallback": true,
+      "fallback_file": "claims_agg_sample.csv",
+      "output_path": "/opt/project/data/raw/2025-02-01/claims.csv",
+      "records": 6,
+      "note": "Download failed. Used sample file claims_agg_sample.csv.",
+      "error": "404 Client Error: NOT FOUND for url: https://www.data.gouv.fr/fr/datasets/r/open-damir-claims.csv"
+    },
+    {
+      "source_name": "prescriptions",
+      "source_url": "https://www.data.gouv.fr/fr/datasets/r/openmedic-prescriptions.csv",
+      "status": "fallback_sample",
+      "used_fallback": true,
+      "fallback_file": "prescriptions_agg_sample.csv",
+      "output_path": "/opt/project/data/raw/2025-02-01/prescriptions.csv",
+      "records": 5,
+      "note": "Download failed. Used sample file prescriptions_agg_sample.csv.",
+      "error": "404 Client Error: NOT FOUND for url: https://www.data.gouv.fr/fr/datasets/r/openmedic-prescriptions.csv"
+    },
+    {
+      "source_name": "regions",
+      "source_url": "https://www.data.gouv.fr/fr/datasets/r/insee-regions.csv",
+      "status": "fallback_sample",
+      "used_fallback": true,
+      "fallback_file": "regions_sample.csv",
+      "output_path": "/opt/project/data/raw/2025-02-01/regions.csv",
+      "records": 5,
+      "note": "Download failed. Used sample file regions_sample.csv.",
+      "error": "404 Client Error: NOT FOUND for url: https://www.data.gouv.fr/fr/datasets/r/insee-regions.csv"
+    }
+  ]
+}

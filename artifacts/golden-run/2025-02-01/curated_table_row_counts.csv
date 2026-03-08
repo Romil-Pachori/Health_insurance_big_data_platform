@@ -1,0 +1,10 @@
+table_name,row_count
+curated.dim_date,47
+curated.dim_patient,259
+curated.dim_provider,5
+curated.dim_region,5
+curated.dim_treatment,6
+curated.fact_claims,126
+curated.fact_prescriptions,133
+curated.fact_reimbursements,119
+curated.fact_visits,85

@@ -1,0 +1,6 @@
+﻿provider_id,provider_name,provider_type,region_id
+P001,CHU Paris Nord,hospital,R11
+P002,Cabinet Lyon Centre,general_practitioner,R84
+P003,Clinique Marseille Sud,clinic,R93
+P004,Pharmacie Lille Nord,pharmacy,R32
+P005,Hopital Nantes Atlantique,hospital,R52

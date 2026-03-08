@@ -1,0 +1,7 @@
+﻿provider_id,region_id,treatment_category,claim_month,claim_count,total_billed,total_reimbursed,claim_status
+P001,R11,cardiology,2025-01,20,9200.00,7600.00,approved
+P001,R11,radiology,2025-02,12,4100.00,3250.00,approved
+P002,R84,general_consultation,2025-01,35,5250.00,4500.00,approved
+P003,R93,orthopedics,2025-01,18,6800.00,5700.00,approved
+P004,R32,pharmacy,2025-01,25,2100.00,1750.00,approved
+P005,R52,emergency,2025-02,16,7900.00,6000.00,approved

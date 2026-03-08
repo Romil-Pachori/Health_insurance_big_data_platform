@@ -1,0 +1,6 @@
+﻿provider_id,region_id,treatment_category,claim_month,prescription_count,total_quantity
+P001,R11,cardiology,2025-01,15,130
+P002,R84,general_consultation,2025-01,42,285
+P003,R93,orthopedics,2025-01,10,74
+P004,R32,pharmacy,2025-01,58,460
+P005,R52,emergency,2025-02,8,49

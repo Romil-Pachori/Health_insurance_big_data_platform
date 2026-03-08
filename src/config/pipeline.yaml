@@ -1,0 +1,88 @@
+project:
+  name: health-insurance-data-platform
+  timezone: Europe/Paris
+  default_run_date: "2025-02-01"
+
+paths:
+  raw_root: "data/raw"
+  staging_root: "data/staging"
+  curated_root: "data/curated"
+  sample_root: "data/raw/sample"
+
+sources:
+  providers:
+    description: "FINESS registry extract"
+    url: "https://www.data.gouv.fr/fr/datasets/r/finess-providers.csv"
+    fallback_file: "providers_sample.csv"
+    format: "csv"
+    required_columns:
+      - provider_id
+      - provider_name
+      - provider_type
+      - region_id
+  claims:
+    description: "Open DAMIR aggregate claims data"
+    url: "https://www.data.gouv.fr/fr/datasets/r/open-damir-claims.csv"
+    fallback_file: "claims_agg_sample.csv"
+    format: "csv"
+    required_columns:
+      - provider_id
+      - region_id
+      - treatment_category
+      - claim_month
+      - claim_count
+      - total_billed
+      - total_reimbursed
+      - claim_status
+  prescriptions:
+    description: "OpenMedic aggregate prescriptions data"
+    url: "https://www.data.gouv.fr/fr/datasets/r/openmedic-prescriptions.csv"
+    fallback_file: "prescriptions_agg_sample.csv"
+    format: "csv"
+    required_columns:
+      - provider_id
+      - region_id
+      - treatment_category
+      - claim_month
+      - prescription_count
+      - total_quantity
+  regions:
+    description: "INSEE regions reference data"
+    url: "https://www.data.gouv.fr/fr/datasets/r/insee-regions.csv"
+    fallback_file: "regions_sample.csv"
+    format: "csv"
+    required_columns:
+      - region_id
+      - region_name
+      - population_group
+
+ingestion:
+  timeout_seconds: 30
+  use_sample_on_failure: true
+  batch_mode: "snapshot"
+
+synthesis:
+  seed: 20260308
+  default_claim_status: "approved"
+  visit_share_hash_threshold: 3
+
+quality:
+  max_null_ratio: 0.0
+  allowed_claim_status:
+    - approved
+    - pending
+    - rejected
+  fail_on_error: true
+
+postgres:
+  host: "${POSTGRES_HOST:-localhost}"
+  port: "${POSTGRES_PORT:-5432}"
+  database: "${POSTGRES_DB:-health_insurance}"
+  user: "${POSTGRES_USER:-health_user}"
+  password: "${POSTGRES_PASSWORD:-health_password}"
+  schemas:
+    raw: "raw"
+    staging: "staging"
+    curated: "curated"
+    quality: "quality"
+

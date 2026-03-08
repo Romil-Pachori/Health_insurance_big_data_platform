@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+.env
+
+data/raw/*/
+data/staging/*/
+data/curated/*/
+!data/raw/sample/
+!data/raw/sample/*.csv
+

@@ -1,0 +1,19 @@
+flowchart LR
+    A[Public Sources<br/>France/EU Open Data] -->|CSV/API| B[Ingestion Module]
+    S[Sample Fixtures<br/>data/raw/sample] -->|fallback| B
+    B --> C[Raw Layer<br/>data/raw/<run_date>]
+    C --> D[Stage Clean (Spark)]
+    D --> E[Synthetic Event Expansion (Spark)]
+    E --> F[Curated Star Schema (Spark)]
+    F --> G[Python Quality Checks]
+    F --> H[PostgreSQL Load]
+    H --> I[SQL Quality Checks]
+    H --> J[Notebook Analytics]
+    K[Airflow DAG<br/>health_insurance_pipeline_v1] --> B
+    K --> D
+    K --> E
+    K --> F
+    K --> G
+    K --> H
+    K --> I
+    K --> J
